@@ -51,13 +51,13 @@ def base_navbar() -> rx.Component:
                         "Services", "layers", "/#"
                     ),
                     navbar_icons_item(
-                        "Pricing", "coins", "/#"
-                    ),
-                    navbar_icons_item(
                         "About Us", "album", navigation.routes.ABOUT_US_ROUTE
                     ),
                     navbar_icons_item(
                         "Contact", "mail", "/#"
+                    ),
+                    navbar_icons_item(
+                        "Chat", "album", navigation.routes.CHAT_ROUTE
                     ),
                     spacing="6",
                 ),
@@ -92,13 +92,13 @@ def base_navbar() -> rx.Component:
                             "Services", "layers", "/#"
                         ),
                         navbar_icons_menu_item(
-                            "Pricing", "coins", "/#"
-                        ),
-                        navbar_icons_menu_item(
                             "About Us", "album", navigation.routes.ABOUT_US_ROUTE
                         ),
                         navbar_icons_menu_item(
                             "Contact", "mail", "/#"
+                        ),
+                        navbar_icons_menu_item(
+                            "Chat", "album", navigation.routes.CHAT_ROUTE
                         ),
                     ),
                     justify="end",
