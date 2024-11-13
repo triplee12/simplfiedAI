@@ -1,1 +1,4 @@
 reflex==0.6.4
+python-decouple
+openai
+psycopg2-binary
