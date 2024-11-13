@@ -16,8 +16,8 @@ def chat_form() -> rx.Component:
                 rx.button('Submit', type='submit'),
                 rx.cond(
                     ChatState.did_submit,
+                    rx.fragment(),
                     rx.text('Submitted successfully'),
-                    rx.text('Did not submit successfully'),
                 ),
             ),
         ),
