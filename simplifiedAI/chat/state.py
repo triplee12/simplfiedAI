@@ -19,17 +19,25 @@ class ChatState(rx.State):
     @rx.var
     def user_did_submit(self) -> bool:
         return self.did_submit
-    
+
+    def create_new_chat_sessions(self):
+        with rx.session() as db_session:
+            obj = ChatModel()
+            db_session.add(obj)
+            db_session.commit()
+            db_session.refresh(obj)
+            self.chat_model = obj
+
+    def clear_and_start_new_chat(self):
+        self.chat_model = None
+        self.create_new_chat_sessions()
+        self.messages = []
+        yield
+
     def on_load(self):
-        print("Running on load")
         if self.chat_model is None:
-            with rx.session() as db_session:
-                obj = ChatModel()
-                db_session.add(obj)
-                db_session.commit()
-                db_session.refresh(obj)
-                self.chat_model = obj
-    
+            self.create_new_chat_sessions()
+
     def insert_message_to_db(self, content, role="unknown"):
         if self.chat_model is None:
             return
