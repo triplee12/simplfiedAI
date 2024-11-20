@@ -1,4 +1,3 @@
-from turtle import width
 import reflex as rx
 
 from simplifiedAI import ui
@@ -39,6 +38,7 @@ def chat_page():
         rx.vstack(
             rx.hstack(
                 rx.heading("Chat here!", size="5"),
+                rx.cond(ChatState.not_found, "Not found", ""),
                 rx.button("+ New chat", on_click=ChatState.clear_and_start_new_chat),
             ),
             rx.box(

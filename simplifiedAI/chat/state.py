@@ -1,6 +1,7 @@
 # import asyncio
 from typing import List
 import reflex as rx
+import sqlmodel
 from simplifiedAI.models import ChatModel, ChatMessageModel
 from . import ai
 
@@ -14,11 +15,19 @@ class ChatMessage(rx.Base):
 class ChatState(rx.State):
     chat_model: ChatModel = None
     did_submit: bool = False
+    not_found: bool = False
     messages: List[ChatMessage] = []
     
     @rx.var
     def user_did_submit(self) -> bool:
         return self.did_submit
+
+    def get_session_id(self) -> int:
+        try:
+            my_session_id = int(self.router.page.params.get('chat_id'))
+        except:
+            my_session_id = 0
+        return my_session_id
 
     def create_new_chat_sessions(self):
         with rx.session() as db_session:
@@ -33,6 +42,28 @@ class ChatState(rx.State):
         self.create_new_chat_sessions()
         self.messages = []
         yield
+
+    def get_chat_sessions_from_db(self, session_id=None):
+        if session_id is None:
+            session_id = self.get_session_id()
+        with rx.session() as db_session:
+            sql_statement = sqlmodel.select(
+                ChatModel
+            ).where(ChatModel.id == session_id)
+            result = db_session.exec(sql_statement).one_or_none()
+            if result is None:
+                self.not_found = True
+            self.chat_model = result
+            messages = result.messages
+            for message in messages:
+                msg_content = message.content
+                msg_role = False if message.role == "user" else True
+                self.append_message_to_ui(msg_content, msg_role)
+
+    def on_detail_load(self):
+        session_id = self.get_session_id()
+        if isinstance(session_id, int):
+            self.get_chat_sessions_from_db(session_id=session_id)
 
     def on_load(self):
         if self.chat_model is None:
