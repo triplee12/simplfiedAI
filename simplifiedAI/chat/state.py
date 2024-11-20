@@ -36,11 +36,22 @@ class ChatState(rx.State):
             db_session.commit()
             db_session.refresh(obj)
             self.chat_model = obj
+            return obj
+
+    def clear_ui(self):
+        self.chat_model = None
+        self.did_submit = False
+        self.not_found = False
+        self.messages = []
+    
+    def create_and_redirect(self):
+        self.clear_ui()
+        new_chat = self.create_new_chat_sessions()
+        return rx.redirect(f"/chat/{new_chat.id}")
 
     def clear_and_start_new_chat(self):
-        self.chat_model = None
+        self.clear_ui()
         self.create_new_chat_sessions()
-        self.messages = []
         yield
 
     def get_chat_sessions_from_db(self, session_id=None):
@@ -62,12 +73,20 @@ class ChatState(rx.State):
 
     def on_detail_load(self):
         session_id = self.get_session_id()
-        if isinstance(session_id, int):
-            self.get_chat_sessions_from_db(session_id=session_id)
+        reload_detail = False
+        if not self.chat_model:
+            reload_detail = True
+        else:
+            if self.chat_model.id != session_id:
+                reload_detail = True
+        if reload_detail:
+            self.clear_ui()
+            if isinstance(session_id, int):
+                self.get_chat_sessions_from_db(session_id=session_id)
 
     def on_load(self):
-        if self.chat_model is None:
-            self.create_new_chat_sessions()
+        self.clear_ui()
+        self.create_new_chat_sessions()
 
     def insert_message_to_db(self, content, role="unknown"):
         if self.chat_model is None:
