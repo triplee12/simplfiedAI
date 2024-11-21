@@ -29,7 +29,7 @@ ENV PATH="/app/.simply/bin:$PATH"
 COPY --chown=reflex:reflex . /app
 
 # Move .build-env to .env if it exists
-RUN if [ -f .build-env ]; then mv ,build-env .env; fi
+RUN if [ -f .build-env ]; then mv .build-env .env; fi
 
 # Set permissions
 RUN chown -R reflex:reflex /app
